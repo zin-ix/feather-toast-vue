@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useToast } from '@/composables/useToast'
+import { useFeatherToast } from '@/composables/useToast'
 import type { ToastPosition } from '@/types/toast'
 
-const { toast } = useToast()
+const { toast } = useFeatherToast()
 
 // Copy install command
 const installCopied = ref(false)
@@ -195,10 +195,10 @@ function fireWithAction() {
             <p class="demo-usage-step__title">Register the plugin in <code class="demo-inline-code">main.ts</code></p>
             <pre class="demo-code-pre"><code><span class="c-purple">import</span> <span class="c-white">{ createApp }</span> <span class="c-purple">from</span> <span class="c-green">'vue'</span>
 <span class="c-purple">import</span> <span class="c-white">App</span> <span class="c-purple">from</span> <span class="c-green">'./App.vue'</span>
-<span class="c-purple">import</span> <span class="c-white">{ ToastPlugin }</span> <span class="c-purple">from</span> <span class="c-green">'feather-toast-vue'</span>
+<span class="c-purple">import</span> <span class="c-white">{ CreateFeatherToast }</span> <span class="c-purple">from</span> <span class="c-green">'feather-toast-vue'</span>
 
-<span class="c-purple">const</span> <span class="c-white">app =</span> <span class="c-blue">createApp</span><span class="c-white">(App)</span>
-<span class="c-white">app</span><span class="c-muted">.</span><span class="c-blue">use</span><span class="c-white">(ToastPlugin)</span>
+ <span class="c-purple">const</span> <span class="c-white">app =</span> <span class="c-blue">createApp</span><span class="c-white">(App)</span>
+ <span class="c-white">app</span><span class="c-muted">.</span><span class="c-blue">use</span><span class="c-white">(CreateFeatherToast)</span>
 <span class="c-white">app</span><span class="c-muted">.</span><span class="c-blue">mount</span><span class="c-white">(</span><span class="c-green">'#app'</span><span class="c-white">)</span></code></pre>
           </div>
         </div>
@@ -210,7 +210,7 @@ function fireWithAction() {
             <p class="demo-usage-step__title">No container wiring needed</p>
             <pre class="demo-code-pre"><code><span class="c-muted">// ToastContainer is mounted automatically by the plugin</span>
 <span class="c-muted">// No changes needed in App.vue</span></code></pre>
-            <p class="demo-usage-note">✦ `app.use(ToastPlugin)` now injects and mounts the container for you.</p>
+            <p class="demo-usage-note">✦ `app.use(CreateFeatherToast)` now injects and mounts the container for you.</p>
           </div>
         </div> -->
 
@@ -218,10 +218,10 @@ function fireWithAction() {
         <div class="demo-usage-step">
           <span class="demo-usage-step__num">2</span>
           <div class="demo-usage-step__body">
-            <p class="demo-usage-step__title">Call <code class="demo-inline-code">useToast()</code> in any component</p>
-            <pre class="demo-code-pre"><code><span class="c-purple">import</span> <span class="c-white">{ useToast }</span> <span class="c-purple">from</span> <span class="c-green">'feather-toast-vue'</span>
+            <p class="demo-usage-step__title">Call <code class="demo-inline-code">useFeatherToast()</code> in any component</p>
+            <pre class="demo-code-pre"><code><span class="c-purple">import</span> <span class="c-white">{ useFeatherToast }</span> <span class="c-purple">from</span> <span class="c-green">'feather-toast-vue'</span>
 
-<span class="c-purple">const</span> <span class="c-white">{ toast } =</span> <span class="c-blue">useToast</span><span class="c-white">()</span>
+<span class="c-purple">const</span> <span class="c-white">{ toast } =</span> <span class="c-blue">useFeatherToast</span><span class="c-white">()</span>
 
 <span class="c-white">toast</span><span class="c-muted">.</span><span class="c-blue">success</span><span class="c-white">({ title:</span> <span class="c-green">'Changes saved'</span><span class="c-white">, description:</span> <span class="c-green">'All good!'</span> <span class="c-white">})</span>
 <span class="c-white">toast</span><span class="c-muted">.</span><span class="c-blue">error</span><span class="c-white">({ title:</span> <span class="c-green">'Something went wrong'</span> <span class="c-white">})</span>

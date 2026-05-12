@@ -34,10 +34,10 @@ npm install feather-toast-vue
 // main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import { ToastPlugin } from 'feather-toast-vue'
+import { CreateFeatherToast } from 'feather-toast-vue'
 
 const app = createApp(App)
-app.use(ToastPlugin)
+app.use(CreateFeatherToast)
 app.mount('#app')
 ```
 
@@ -50,9 +50,9 @@ app.mount('#app')
 ### Basic
 
 ```ts
-import { useToast } from 'feather-toast-vue'
+import { useFeatherToast } from 'feather-toast-vue'
 
-const { toast } = useToast()
+const { toast } = useFeatherToast()
 
 toast({
   title: 'Event Created',

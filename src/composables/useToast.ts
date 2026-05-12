@@ -123,7 +123,7 @@ toast.promise = async function <T>(
   }
 }
 
-export function useToast() {
+export function useFeatherToast() {
   return {
     toast,
     toasts,
@@ -131,3 +131,6 @@ export function useToast() {
     dismissAll,
   }
 }
+
+// Backwards compatibility alias
+export const useToast = useFeatherToast

@@ -1,16 +1,25 @@
 import { createVNode, render, type App } from 'vue'
 import ToastContainer from '../components/ToastContainer.vue'
-import { useToast } from '../composables/useToast'
+import { useFeatherToast } from '../composables/useToast'
+import toastStyles from '../assets/toast.css?inline'
 
 const TOAST_ROOT_ID = 'feather-toast-root'
+const TOAST_STYLE_ID = 'feather-toast-style'
 
-export const ToastPlugin = {
+export const CreateFeatherToast = {
   install(app: App) {
-    const toastApi = useToast()
+    const toastApi = useFeatherToast()
     app.provide('toast', toastApi)
 
     if (typeof document === 'undefined') {
       return
+    }
+
+    if (!document.getElementById(TOAST_STYLE_ID)) {
+      const styleTag = document.createElement('style')
+      styleTag.id = TOAST_STYLE_ID
+      styleTag.textContent = toastStyles
+      document.head.appendChild(styleTag)
     }
 
     let mountPoint = document.getElementById(TOAST_ROOT_ID)
@@ -36,4 +45,4 @@ export const ToastPlugin = {
   },
 }
 
-export { useToast } from '../composables/useToast'
+export { useFeatherToast } from '../composables/useToast'
