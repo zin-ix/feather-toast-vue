@@ -1,0 +1,305 @@
+/* ============================================
+   Feather Toast — Minimalist Design System
+   ============================================ */
+
+:root {
+  --toast-bg: #ffffff;
+  --toast-border: #e4e4e7;
+  --toast-text: #18181b;
+  --toast-text-muted: #71717a;
+  --toast-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --toast-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --toast-radius: 10px;
+  --toast-width: 360px;
+  --toast-gap: 8px;
+  --toast-z: 99999;
+
+  /* Icon accent colors */
+  --toast-c-success: #16a34a;
+  --toast-c-error:   #dc2626;
+  --toast-c-warning: #d97706;
+  --toast-c-info:    #2563eb;
+  --toast-c-muted:   #71717a;
+
+  /* Animation easings */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-exit:   cubic-bezier(0.4, 0, 1, 1);
+}
+
+.toast-viewport {
+  position: fixed;
+  z-index: var(--toast-z);
+  display: flex;
+  flex-direction: column;
+  gap: var(--toast-gap);
+  padding: 16px;
+  pointer-events: none;
+  max-height: 100svh;
+  overflow: visible;
+  width: fit-content;
+}
+
+.toast-viewport--top-right    { top: 0; right: 0; align-items: flex-end; }
+.toast-viewport--top-left     { top: 0; left: 0;  align-items: flex-start; }
+.toast-viewport--top-center   { top: 0; left: 50%; transform: translateX(-50%); align-items: center; }
+.toast-viewport--bottom-right { bottom: 0; right: 0; align-items: flex-end;   flex-direction: column-reverse; }
+.toast-viewport--bottom-left  { bottom: 0; left: 0;  align-items: flex-start; flex-direction: column-reverse; }
+.toast-viewport--bottom-center{ bottom: 0; left: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
+
+/* ============================================
+   Toast Card
+   ============================================ */
+.toast-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: var(--toast-width);
+  max-width: calc(100vw - 32px);
+  padding: 14px;
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  border-radius: var(--toast-radius);
+  box-shadow: var(--toast-shadow);
+  pointer-events: auto;
+  cursor: default;
+  user-select: none;
+  touch-action: pan-y;
+  transition: box-shadow 0.18s ease;
+}
+
+.toast-card:hover {
+  box-shadow: var(--toast-shadow-hover);
+}
+
+/* ============================================
+   Icons — 16×16 minimalist
+   ============================================ */
+.toast-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.toast-icon--success { color: var(--toast-c-success); }
+.toast-icon--error   { color: var(--toast-c-error); }
+.toast-icon--warning { color: var(--toast-c-warning); }
+.toast-icon--info    { color: var(--toast-c-info); }
+
+/* ============================================
+   Spinner
+   ============================================ */
+@keyframes toast-spin {
+  to { transform: rotate(360deg); }
+}
+
+.toast-spinner {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border: 1.5px solid #e4e4e7;
+  border-top-color: var(--toast-c-muted);
+  border-radius: 50%;
+  animation: toast-spin 0.7s linear infinite;
+}
+
+/* ============================================
+   Body
+   ============================================ */
+.toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--toast-text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.toast-description {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--toast-text-muted);
+  margin: 2px 0 0;
+}
+
+/* ============================================
+   Close Button — hidden, fades in on hover
+   ============================================ */
+.toast-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: -3px -3px 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.toast-card:hover .toast-close {
+  opacity: 1;
+}
+
+.toast-close:hover {
+  background: #f4f4f5;
+  color: var(--toast-text);
+}
+
+.toast-close svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ============================================
+   Action Button
+   ============================================ */
+.toast-action-btn {
+  flex-shrink: 0;
+  align-self: center;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1.4;
+  color: var(--toast-text);
+  background: transparent;
+  border: 1px solid var(--toast-border);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.toast-action-btn:hover {
+  background: #f4f4f5;
+  border-color: #d4d4d8;
+}
+
+/* ============================================================
+   TransitionGroup Animations
+   Using enter-from/to + leave-from/to with CSS transitions.
+   leave-active uses position:absolute so siblings reflow
+   smoothly via the .move transition simultaneously.
+   ============================================================ */
+
+/* Shared move (sibling reflow) */
+.toast-slide-right-move,
+.toast-slide-left-move,
+.toast-slide-down-move,
+.toast-slide-up-move {
+  transition: transform 0.35s var(--ease-spring);
+}
+
+/* ── RIGHT side (top-right, bottom-right) ── */
+.toast-slide-right-enter-active {
+  transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring);
+}
+.toast-slide-right-leave-active {
+  transition: opacity 0.22s var(--ease-exit), transform 0.22s var(--ease-exit);
+  position: absolute;
+  pointer-events: none;
+  right: 16px;
+}
+.toast-slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(calc(100% + 24px)) scale(0.94);
+}
+.toast-slide-right-enter-to   { opacity: 1; transform: translateX(0) scale(1); }
+.toast-slide-right-leave-from { opacity: 1; transform: translateX(0) scale(1); }
+.toast-slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(calc(100% + 24px)) scale(0.94);
+}
+
+/* ── LEFT side (top-left, bottom-left) ── */
+.toast-slide-left-enter-active {
+  transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring);
+}
+.toast-slide-left-leave-active {
+  transition: opacity 0.22s var(--ease-exit), transform 0.22s var(--ease-exit);
+  position: absolute;
+  pointer-events: none;
+  left: 16px;
+}
+.toast-slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(calc(-100% - 24px)) scale(0.94);
+}
+.toast-slide-left-enter-to   { opacity: 1; transform: translateX(0) scale(1); }
+.toast-slide-left-leave-from { opacity: 1; transform: translateX(0) scale(1); }
+.toast-slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(calc(-100% - 24px)) scale(0.94);
+}
+
+/* ── TOP center ── */
+.toast-slide-down-enter-active {
+  transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring);
+}
+.toast-slide-down-leave-active {
+  transition: opacity 0.22s var(--ease-exit), transform 0.22s var(--ease-exit);
+  position: absolute;
+  pointer-events: none;
+}
+.toast-slide-down-enter-from {
+  opacity: 0;
+  transform: translateY(-18px) scale(0.94);
+}
+.toast-slide-down-enter-to   { opacity: 1; transform: translateY(0) scale(1); }
+.toast-slide-down-leave-from { opacity: 1; transform: translateY(0) scale(1); }
+.toast-slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-18px) scale(0.94);
+}
+
+/* ── BOTTOM center ── */
+.toast-slide-up-enter-active {
+  transition: opacity 0.4s var(--ease-spring), transform 0.4s var(--ease-spring);
+}
+.toast-slide-up-leave-active {
+  transition: opacity 0.22s var(--ease-exit), transform 0.22s var(--ease-exit);
+  position: absolute;
+  pointer-events: none;
+}
+.toast-slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(18px) scale(0.94);
+}
+.toast-slide-up-enter-to   { opacity: 1; transform: translateY(0) scale(1); }
+.toast-slide-up-leave-from { opacity: 1; transform: translateY(0) scale(1); }
+.toast-slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(18px) scale(0.94);
+}
+
+/* ============================================
+   Reduced motion
+   ============================================ */
+@media (prefers-reduced-motion) {
+  .toast-card,
+  .toast-slide-right-enter-active, .toast-slide-right-leave-active,
+  .toast-slide-left-enter-active,  .toast-slide-left-leave-active,
+  .toast-slide-down-enter-active,  .toast-slide-down-leave-active,
+  .toast-slide-up-enter-active,    .toast-slide-up-leave-active,
+  .toast-slide-right-move, .toast-slide-left-move,
+  .toast-slide-down-move,  .toast-slide-up-move {
+    transition: none !important;
+    animation: none !important;
+  }
+}
