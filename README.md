@@ -1,28 +1,28 @@
-# 🪶 Feather Toast Vue
+# Feather Toast Vue
 
-A lightweight, smooth Vue 3 toast notification plugin with minimalist design and buttery animations.
+A lightweight Vue 3 toast notification plugin. Minimal by design, with smooth animations and a clean API that stays out of your way.
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---------|-------------|
-| 🎨 **6 Variants** | `default` · `success` · `error` · `warning` · `info` · `loading` |
-| 📍 **6 Positions** | `top-right` · `top-left` · `top-center` · `bottom-right` · `bottom-left` · `bottom-center` |
-| 🌊 **Smooth Animations** | Spring-based slide + fade + scale with `cubic-bezier(0.16, 1, 0.3, 1)` |
-| 👆 **Swipe to Dismiss** | Horizontal swipe gesture with snap-back |
-| ⏸️ **Hover Pause** | Auto-dismiss timer pauses accurately on hover |
-| 🔄 **Promise API** | `toast.promise()` — loading → success / error |
-| ⚡ **Action Button** | Optional inline action on any toast |
-| 🧩 **Vue Plugin** | One-line install with `app.use(ToastPlugin)` |
-| 📦 **Zero Dependencies** | Only Vue 3 — no Tailwind, no UI library |
-| 🔒 **TypeScript** | Fully typed API |
-| ♿ **Accessible** | `aria-live`, `role="alert"`, `prefers-reduced-motion` support |
+| 6 Variants | `default` · `success` · `error` · `warning` · `info` · `loading` |
+| 6 Positions | `top-right` · `top-left` · `top-center` · `bottom-right` · `bottom-left` · `bottom-center` |
+| Smooth Animations | Spring-based slide + fade + scale with `cubic-bezier(0.16, 1, 0.3, 1)` |
+| Swipe to Dismiss | Horizontal swipe gesture with snap-back |
+| Hover Pause | Auto-dismiss timer pauses accurately on hover |
+| Promise API | `toast.promise()` — loading → success / error |
+| Action Button | Optional inline action on any toast |
+| Vue Plugin | One-line install with `app.use(ToastPlugin)` |
+| Zero Dependencies | Only Vue 3 — no Tailwind, no UI library |
+| TypeScript | Fully typed API |
+| Accessible | `aria-live`, `role="alert"`, `prefers-reduced-motion` support |
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install feather-toast-vue
@@ -45,7 +45,7 @@ app.mount('#app')
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Basic
 
@@ -63,10 +63,10 @@ toast({
 ### Variants
 
 ```ts
-toast.success({ title: 'Saved',    description: 'Changes applied.' })
-toast.error({   title: 'Error',    description: 'Something went wrong.' })
-toast.warning({ title: 'Warning',  description: 'Disk space is low.' })
-toast.info({    title: 'Info',     description: 'Version 2.4 is available.' })
+toast.success({ title: 'Saved',        description: 'Changes applied.' })
+toast.error({   title: 'Error',        description: 'Something went wrong.' })
+toast.warning({ title: 'Warning',      description: 'Disk space is low.' })
+toast.info({    title: 'Info',         description: 'Version 2.4 is available.' })
 toast.loading({ title: 'Uploading...', description: 'Please wait.' })
 ```
 
@@ -131,7 +131,7 @@ toast.dismissAll()
 
 ---
 
-## 📐 API Reference
+## API Reference
 
 ### `useToast()`
 
@@ -177,17 +177,17 @@ interface ToastOptions {
 ### Positions
 
 ```
-┌──────────┬────────────┬───────────┐
-│ top-left │ top-center │ top-right │
-│          │            │           │
-│          │            │           │
-│ bot-left │ bot-center │ bot-right │
-└──────────┴────────────┴───────────┘
++----------+------------+-----------+
+| top-left | top-center | top-right |
+|          |            |           |
+|          |            |           |
+| bot-left | bot-center | bot-right |
++----------+------------+-----------+
 ```
 
 ---
 
-## 🎨 Design System
+## Design System
 
 ### Color Tokens
 
@@ -203,13 +203,13 @@ interface ToastOptions {
 
 ### Icon Accent Colors
 
-| Variant | Color | Hex |
-|---------|-------|-----|
-| Success | 🟢 Green | `#16a34a` |
-| Error | 🔴 Red | `#dc2626` |
-| Warning | 🟡 Amber | `#d97706` |
-| Info | 🔵 Blue | `#2563eb` |
-| Loading | ⚫ Gray | `#71717a` |
+| Variant | Hex |
+|---------|-----|
+| Success | `#16a34a` |
+| Error | `#dc2626` |
+| Warning | `#d97706` |
+| Info | `#2563eb` |
+| Loading | `#71717a` |
 
 ### Customization via CSS Variables
 
@@ -229,18 +229,18 @@ interface ToastOptions {
 
 ---
 
-## 🎬 Animation Spec
+## Animation Spec
 
 | Phase | Duration | Easing |
 |-------|----------|--------|
-| **Enter** | 400ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
-| **Exit** | 220ms | `cubic-bezier(0.4, 0, 1, 1)` — snappy |
-| **Sibling reflow** | 350ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
-| **Swipe snap-back** | 360ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
+| Enter | 400ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
+| Exit | 220ms | `cubic-bezier(0.4, 0, 1, 1)` — snappy |
+| Sibling reflow | 350ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
+| Swipe snap-back | 360ms | `cubic-bezier(0.16, 1, 0.3, 1)` — spring |
 
 ---
 
-## 📁 File Structure
+## File Structure
 
 ```
 src/
@@ -260,7 +260,7 @@ src/
 
 ---
 
-## 📊 Bundle Size
+## Bundle Size
 
 | File | Raw | Gzipped |
 |------|-----|---------|
@@ -272,6 +272,6 @@ Zero external dependencies beyond Vue 3.
 
 ---
 
-## 📄 License
+## License
 
 MIT © feather-toast
