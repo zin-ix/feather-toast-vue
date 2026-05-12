@@ -152,7 +152,7 @@ function fireWithAction() {
     <!-- Header -->
     <header class="demo-header">
       <div class="demo-header__badge">Vue 3 Plugin</div>
-      <h1 class="demo-header__title">feather-toast</h1>
+      <h1 class="demo-header__title">feather-toast-vue</h1>
       <p class="demo-header__subtitle">
         A lightweight, smooth toast notification plugin with minimalist design and spring-based animations.
       </p>
