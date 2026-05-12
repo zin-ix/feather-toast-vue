@@ -131,11 +131,11 @@ function fireWithAction() {
     <!-- Top nav -->
     <nav class="demo-nav">
       <div class="demo-nav__left">
-        <span class="demo-nav__logo">🪶 feather-toast</span>
-        <span class="demo-nav__version">v1.0.0</span>
+        <span class="demo-nav__logo">🪶 feather-toast-vue</span>
+        <span class="demo-nav__version">v1.0.4</span>
       </div>
       <a
-        href="https://github.com/zin-ix/feather-toast"
+        href="https://github.com/zin-ix/feather-toast-vue"
         target="_blank"
         rel="noopener noreferrer"
         class="demo-nav__github"
