@@ -1,6 +1,6 @@
 {
   "name": "feather-toast-vue",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A lightweight, customizable toast notification plugin for Vue 3",
   "homepage": "https://zin-ix.github.io/feather-toast-vue/",
   "repository": {
@@ -22,13 +22,10 @@
   ],
   "license": "MIT",
   "author": "zin",
-
   "type": "module",
-
   "main": "./dist/feather-toast.umd.cjs",
   "module": "./dist/feather-toast.es.js",
   "types": "./dist/index.d.ts",
-
   "exports": {
     ".": {
       "import": "./dist/feather-toast.es.js",
@@ -37,11 +34,9 @@
     },
     "./style.css": "./dist/feather-toast-vue.css"
   },
-
   "files": [
     "dist"
   ],
-
   "scripts": {
     "dev": "vite",
     "build": "npm run build:lib",
@@ -52,11 +47,9 @@
     "type-check": "vue-tsc --build --force",
     "deploy": "npm run build:demo && gh-pages -d dist"
   },
-
   "peerDependencies": {
     "vue": "^3.5.0"
   },
-
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
@@ -70,7 +63,6 @@
     "vue": "^3.5.32",
     "vue-tsc": "^3.2.6"
   },
-
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   }
