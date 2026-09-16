@@ -5,7 +5,8 @@
   "compilerOptions": {
     // Generate .d.ts declaration files for library consumers
     "declaration": true,
-    "emitDeclarationOnly": false,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
     "rootDir": "./src",
     "outDir": "./dist",
 

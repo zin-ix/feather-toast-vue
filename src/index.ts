@@ -10,4 +10,11 @@ export type {
   ToastVariant,
   ToastPosition,
   ToastPromiseOptions,
+  ToastConfig,
+  UndoToastOptions,
+  StepToastController,
+  ProgressToastController,
+  NetworkToastOptions,
+  NetworkToastController,
+  ToastComponent,
 } from './types/toast'
