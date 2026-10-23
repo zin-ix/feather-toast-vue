@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, inject, h } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, inject, h } from 'vue'
 import { useFeatherToast } from '@/composables/useToast'
 import type { ToastPosition } from '@/types/toast'
 
@@ -22,6 +22,7 @@ function toggleTheme() {
 
 watch(isDark, (dark) => {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+  toast.config({ theme: dark ? 'dark' : 'light' })
 }, { immediate: true })
 
 // ── Install copy ────────────────────────────────────
@@ -273,7 +274,7 @@ const apiRows: ApiRow[] = [
   { prop: 'position',    type: 'ToastPosition',                                   default: '"bottom-right"', description: 'One of six corner / edge positions.' },
   { prop: 'duration',    type: 'number',                                          default: '5000',           description: 'Auto-dismiss delay in milliseconds.' },
   { prop: 'dismissible', type: 'boolean',                                         default: 'true',           description: 'Whether users can manually close the toast.' },
-  { prop: 'variant',     type: '"default" | "success" | "error" | "warning" | "info" | "loading" | "destructive" | "offline" | "update" | "neutral"', default: '"default"', description: 'Controls the icon and accent color.' },
+  { prop: 'variant',     type: '"default" | "success" | "error" | "warning" | "info" | "loading" | "offline" | "update"', default: '"default"', description: 'Controls the icon and accent color.' },
   { prop: 'showProgress',type: 'boolean',                                         default: 'false',          description: 'Renders an animated countdown progress bar at bottom of card.' },
   { prop: 'progress',    type: 'number (0-100)',                                  default: 'undefined',      description: 'Explicit progress percentage bar.' },
   { prop: 'action',      type: '{ label: string; onClick: () => void }',          default: 'undefined',      description: 'Renders an inline action button on the toast.' },
@@ -310,9 +311,30 @@ const promiseApiRows: ApiRow[] = [
 // ── Changelog ───────────────────────────────────────
 const changelog = [
   {
+    version: 'v3.0.0',
+    date: '2026-10-23',
+    tag: 'latest',
+    changes: [
+      'Sonner-style collapsed stack: hover (desktop) or tap (mobile) to expand, timers pause while expanded',
+      'GPU-only motion (transform / opacity), velocity-aware swipe, full-width safe-area layout on mobile',
+      'Identical toasts merge into one with a ×N badge instead of stacking',
+      'New toast.retry(): failed async work shows an error with a Retry button that re-runs it in place',
+      'New toast.confirm(): awaitable inline confirmation, plus a secondary cancel button on any toast',
+      'toast.error(err) accepts thrown errors directly; id option updates an existing toast in place',
+      'Reactive toasts: title / description / progress accept refs, computed or getters',
+      'New toast.flash(): toasts that survive reloads and full-page redirects',
+      'Testing helpers: getToasts, expectToast, expectNoToasts, clickToastAction, resetToasts',
+      'SSR-safe: ToastContainer renders nothing on the server',
+      'Fix: toast.custom() now actually renders the passed component',
+      'Config: richColors, theme (light / dark / system), expand, visibleToasts, group',
+      'CSS shipped once (auto-injected); opt out with app.use(CreateFeatherToast, { injectStyles: false })',
+      'Breaking: removed destructive (use error) and neutral (use default) variants',
+    ],
+  },
+  {
     version: 'v2.1.0',
     date: '2026-09-16',
-    tag: 'latest',
+    tag: null,
     changes: [
       'Shadcn / Sonner style smooth in & out transitions with micro-scale & spring physics',
       'Stack limit support: configurable max visible toasts (toast.config({ max: 3 })) with smooth queue eviction',
@@ -408,8 +430,48 @@ function fireInfo() {
 function fireLoading() {
   toast.loading({ title: 'Uploading files...', description: 'Please wait while your files are being uploaded.', position: selectedPosition.value })
 }
-function fireDestructive() {
-  toast.destructive({ title: '3 items deleted', description: 'This action cannot be undone.', position: selectedPosition.value })
+let flakyCalls = 0
+function fireRetry() {
+  flakyCalls = 0
+  const flakyFetch = () =>
+    new Promise<{ rows: number }>((resolve, reject) =>
+      // Fails the first attempt so the Retry button shows up
+      setTimeout(() => (++flakyCalls < 2 ? reject(new Error('Request timed out')) : resolve({ rows: 128 })), 1200),
+    )
+  toast.retry(flakyFetch, {
+    loading: 'Syncing contacts...',
+    success: (data) => `Synced ${data.rows} contacts`,
+    position: selectedPosition.value,
+  }).catch(() => {})
+}
+function fireCaughtError() {
+  try {
+    JSON.parse('{ invalid json')
+  } catch (err) {
+    toast.error(err)
+  }
+}
+function fireReactive() {
+  const pct = ref(0)
+  const id = toast.loading({
+    title: computed(() => (pct.value < 100 ? `Uploading… ${pct.value}%` : 'Upload complete')),
+    progress: pct,
+    position: selectedPosition.value,
+  })
+  const timer = setInterval(() => {
+    pct.value = Math.min(100, pct.value + 7)
+    if (pct.value === 100) {
+      clearInterval(timer)
+      toast.updateToast(id, { variant: 'success', duration: 3000 })
+    }
+  }, 150)
+}
+function fireFlash() {
+  toast.flash.success({ title: 'Saved before reload', description: 'This toast survived a full page reload.' })
+  setTimeout(() => window.location.reload(), 400)
+}
+function fireGrouped() {
+  toast.warning({ title: 'Rate limit reached', position: selectedPosition.value })
 }
 function fireOffline() {
   const id = toast.offline({ title: 'You\'re offline', description: 'Check your network connection.', position: selectedPosition.value })
@@ -424,8 +486,35 @@ function fireUpdate() {
     action: { label: 'Update', onClick: () => toast.success({ title: 'Updated!', position: selectedPosition.value }) },
   })
 }
-function fireNeutral() {
-  toast.neutral({ title: 'Session refreshed', description: 'Your session token was renewed.', position: selectedPosition.value })
+async function fireConfirm() {
+  const ok = await toast.confirm({
+    title: 'Delete 3 files?',
+    description: 'This cannot be undone.',
+    confirmLabel: 'Delete',
+    position: selectedPosition.value,
+  })
+  if (ok) toast.success({ title: 'Files deleted', position: selectedPosition.value })
+  else toast({ title: 'Kept your files', position: selectedPosition.value })
+}
+let saveCount = 0
+function fireDedupe() {
+  saveCount++
+  toast.success({
+    id: 'autosave',
+    title: saveCount === 1 ? 'Draft saved' : `Draft saved ×${saveCount}`,
+    description: 'Click again — it updates in place instead of stacking.',
+    position: selectedPosition.value,
+  })
+}
+const richColors = ref(false)
+const expandStack = ref(false)
+watch([richColors, expandStack], ([rich, expand]) => toast.config({ richColors: rich, expand }))
+function fireBurst() {
+  const p = selectedPosition.value
+  toast.success({ title: 'Upload complete', description: 'report-q3.pdf', position: p })
+  setTimeout(() => toast.info({ title: 'Synced to cloud', position: p }), 150)
+  setTimeout(() => toast.warning({ title: 'Storage 90% full', description: 'Consider cleaning up old files.', position: p }), 300)
+  setTimeout(() => toast.error({ title: 'Thumbnail failed', position: p }), 450)
 }
 function firePromise() {
   const fakeApiCall = new Promise<{ name: string }>((resolve, reject) => {
@@ -838,9 +927,9 @@ function fireNetwork() {
               <span class="vbtn__dot vbtn__dot--spin"></span>
               <span class="vbtn__label">Loading</span>
             </button>
-            <button class="vbtn" @click="fireDestructive">
-              <span class="vbtn__dot" style="background:#ef4444"></span>
-              <span class="vbtn__label">Destructive</span>
+            <button class="vbtn" @click="fireRetry">
+              <span class="vbtn__dot" style="background:#dc2626"></span>
+              <span class="vbtn__label">Retry</span>
             </button>
             <button class="vbtn" @click="fireOffline">
               <span class="vbtn__dot" style="background:#6b7280"></span>
@@ -850,9 +939,44 @@ function fireNetwork() {
               <span class="vbtn__dot" style="background:#8b5cf6"></span>
               <span class="vbtn__label">Update</span>
             </button>
-            <button class="vbtn" @click="fireNeutral">
-              <span class="vbtn__dot" style="background:#a1a1aa"></span>
-              <span class="vbtn__label">Neutral</span>
+            <button class="vbtn" @click="fireCaughtError">
+              <span class="vbtn__dot" style="background:#dc2626"></span>
+              <span class="vbtn__label">toast.error(err)</span>
+            </button>
+            <button class="vbtn" @click="fireGrouped">
+              <span class="vbtn__dot" style="background:#d97706"></span>
+              <span class="vbtn__label">Group (click ×3)</span>
+            </button>
+            <button class="vbtn" @click="fireReactive">
+              <span class="vbtn__dot" style="background:#2563eb"></span>
+              <span class="vbtn__label">Reactive (ref)</span>
+            </button>
+            <button class="vbtn" @click="fireFlash">
+              <span class="vbtn__dot" style="background:#16a34a"></span>
+              <span class="vbtn__label">Flash + reload</span>
+            </button>
+            <button class="vbtn" @click="fireConfirm">
+              <span class="vbtn__dot" style="background:#d97706"></span>
+              <span class="vbtn__label">Confirm</span>
+            </button>
+            <button class="vbtn" @click="fireDedupe">
+              <span class="vbtn__dot" style="background:var(--muted)"></span>
+              <span class="vbtn__label">Dedupe (same id)</span>
+            </button>
+          </div>
+          <p class="section__desc">Stack behaviour:</p>
+          <div class="variant-grid">
+            <button class="vbtn" @click="richColors = !richColors">
+              <span class="vbtn__dot" :style="{ background: richColors ? '#16a34a' : 'var(--muted)' }"></span>
+              <span class="vbtn__label">Rich colors: {{ richColors ? 'on' : 'off' }}</span>
+            </button>
+            <button class="vbtn" @click="expandStack = !expandStack">
+              <span class="vbtn__dot" :style="{ background: expandStack ? '#16a34a' : 'var(--muted)' }"></span>
+              <span class="vbtn__label">Always expanded: {{ expandStack ? 'on' : 'off' }}</span>
+            </button>
+            <button class="vbtn" @click="fireBurst">
+              <span class="vbtn__dot" style="background:#2563eb"></span>
+              <span class="vbtn__label">Fire 4 at once</span>
             </button>
           </div>
         </section>

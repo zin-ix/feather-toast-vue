@@ -1,6 +1,6 @@
 {
   "name": "feather-toast-vue",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A lightweight, customizable toast notification plugin for Vue 3",
   "homepage": "https://zin-ix.github.io/feather-toast-vue/",
   "repository": {

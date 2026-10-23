@@ -1,84 +1,217 @@
 /* ============================================
-   Feather Toast v2 — Ultra-Minimalist
+   Feather Toast — Sonner-style stacked toasts
+   Every motion is transform/opacity driven by CSS
+   variables, so it stays on the compositor (60fps on
+   mobile). Inline vars set by Toast.vue:
+     --index    0 = front of the stack
+     --offset   px distance from the edge when expanded
+     --h        measured height of this toast
+     --front-h  measured height of the front toast
+     --swipe-x  live swipe offset
    ============================================ */
 
 :root {
   --toast-bg: #ffffff;
-  --toast-border: rgba(0, 0, 0, 0.06);
-  --toast-text: #18181b;
+  --toast-border: rgba(0, 0, 0, 0.08);
+  --toast-text: #09090b;
   --toast-text-muted: #71717a;
-  --toast-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.06);
-  --toast-radius: 8px;
-  --toast-width: 340px;
-  --toast-gap: 8px;
+  --toast-hover: #f4f4f5;
+  --toast-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --toast-radius: 10px;
+  --toast-width: 356px;
+  --toast-gap: 14px;
+  --toast-peek: 14px;
+  --toast-edge: 24px;
   --toast-z: 99999;
 
-  /* Icon accent colors */
   --toast-c-success:     #16a34a;
   --toast-c-error:       #dc2626;
   --toast-c-warning:     #d97706;
   --toast-c-info:        #2563eb;
   --toast-c-muted:       #71717a;
-  --toast-c-destructive: #ef4444;
   --toast-c-offline:     #6b7280;
   --toast-c-update:      #8b5cf6;
-  --toast-c-neutral:     #a1a1aa;
 
-  /* Animation easings — tuned for butter-smooth feel */
-  --ease-spring:   cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-exit:     cubic-bezier(0.32, 0, 0.67, 0);
-  --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+  --toast-ease: cubic-bezier(0.21, 1.02, 0.73, 1);
+  --toast-duration: 400ms;
 }
 
+/* ============================================
+   Themes
+   ============================================ */
+.toast-viewport[data-theme='dark'] {
+  --toast-bg: #09090b;
+  --toast-border: rgba(255, 255, 255, 0.1);
+  --toast-text: #fafafa;
+  --toast-text-muted: #a1a1aa;
+  --toast-hover: rgba(255, 255, 255, 0.08);
+  --toast-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toast-viewport[data-theme='system'] {
+    --toast-bg: #09090b;
+    --toast-border: rgba(255, 255, 255, 0.1);
+    --toast-text: #fafafa;
+    --toast-text-muted: #a1a1aa;
+    --toast-hover: rgba(255, 255, 255, 0.08);
+    --toast-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Rich colors — tinted surfaces for status variants */
+.toast-viewport[data-rich] .toast-card--success { --toast-bg: #ecfdf3; --toast-border: #bffcd9; --toast-text: #008a2e; }
+.toast-viewport[data-rich] .toast-card--error { --toast-bg: #fff0f0; --toast-border: #ffe0e1; --toast-text: #e60000; }
+.toast-viewport[data-rich] .toast-card--warning { --toast-bg: #fffcf0; --toast-border: #fdf5d3; --toast-text: #dc7609; }
+.toast-viewport[data-rich] .toast-card--info { --toast-bg: #f0f8ff; --toast-border: #d3e0fd; --toast-text: #0973dc; }
+.toast-viewport[data-rich] .toast-card--update { --toast-bg: #f5f3ff; --toast-border: #e4defe; --toast-text: #6d28d9; }
+.toast-viewport[data-rich][data-theme='dark'] .toast-card--success { --toast-bg: #001f0f; --toast-border: #003d1c; --toast-text: #59f3a6; }
+.toast-viewport[data-rich][data-theme='dark'] .toast-card--error { --toast-bg: #2d0607; --toast-border: #4d0408; --toast-text: #ff9ea1; }
+.toast-viewport[data-rich][data-theme='dark'] .toast-card--warning { --toast-bg: #1d1f00; --toast-border: #3d3d00; --toast-text: #f3cf58; }
+.toast-viewport[data-rich][data-theme='dark'] .toast-card--info { --toast-bg: #000d1f; --toast-border: #00113d; --toast-text: #5896f3; }
+.toast-viewport[data-rich][data-theme='dark'] .toast-card--update { --toast-bg: #170b2e; --toast-border: #2e1a5c; --toast-text: #c4b5fd; }
+.toast-viewport[data-rich] .toast-description { color: var(--toast-text); opacity: 0.8; }
+
+/* ============================================
+   Viewport — zero-height anchor at the screen edge
+   ============================================ */
 .toast-viewport {
+  --lift: -1;
   position: fixed;
   z-index: var(--toast-z);
-  display: flex;
-  flex-direction: column;
-  gap: var(--toast-gap);
-  padding: 16px;
-  pointer-events: none;
-  max-height: 100svh;
-  overflow: visible;
-  width: fit-content;
+  width: var(--toast-width);
+  max-width: calc(100vw - var(--toast-edge) * 2);
+  height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: inherit;
 }
 
-.toast-viewport--top-right    { top: 0; right: 0; align-items: flex-end; }
-.toast-viewport--top-left     { top: 0; left: 0;  align-items: flex-start; }
-.toast-viewport--top-center   { top: 0; left: 50%; transform: translateX(-50%); align-items: center; }
-.toast-viewport--bottom-right { bottom: 0; right: 0; align-items: flex-end;   flex-direction: column-reverse; }
-.toast-viewport--bottom-left  { bottom: 0; left: 0;  align-items: flex-start; flex-direction: column-reverse; }
-.toast-viewport--bottom-center{ bottom: 0; left: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
+.toast-viewport[data-y='top']    { --lift: 1;  top: var(--toast-edge); }
+.toast-viewport[data-y='bottom'] { --lift: -1; bottom: var(--toast-edge); }
+
+.toast-viewport--top-right,
+.toast-viewport--bottom-right  { right: var(--toast-edge); }
+.toast-viewport--top-left,
+.toast-viewport--bottom-left   { left: var(--toast-edge); }
+.toast-viewport--top-center,
+.toast-viewport--bottom-center { left: 50%; transform: translateX(-50%); }
 
 /* ============================================
-   Toast Card — slim, airy, minimal
+   Toast Card
    ============================================ */
 .toast-card {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  width: var(--toast-width);
-  max-width: calc(100vw - 32px);
-  padding: 11px 14px;
+  --y: calc(var(--lift) * -100%);
+  --s: 1;
+  position: absolute;
+  z-index: calc(1000 - var(--index, 0));
+  left: 0;
+  right: 0;
+  height: var(--h, auto);
+  box-sizing: border-box;
+  margin: 0;
   background: var(--toast-bg);
-  border: 0.5px solid var(--toast-border);
   border-radius: var(--toast-radius);
-  box-shadow: var(--toast-shadow);
+  box-shadow: 0 0 0 1px var(--toast-border), var(--toast-shadow);
+  color: var(--toast-text);
+  opacity: 0;
+  outline: none;
   pointer-events: auto;
-  cursor: default;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   touch-action: pan-y;
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: subpixel-antialiased;
+  transform: translate3d(var(--swipe-x, 0px), var(--y), 0) scale(var(--s));
+  transition:
+    transform var(--toast-duration) var(--toast-ease),
+    opacity var(--toast-duration) var(--toast-ease),
+    height var(--toast-duration) var(--toast-ease),
+    box-shadow 200ms ease;
+  will-change: transform, opacity;
+}
+
+.toast-viewport[data-y='bottom'] .toast-card { bottom: 0; transform-origin: center bottom; }
+.toast-viewport[data-y='top']    .toast-card { top: 0;    transform-origin: center top; }
+
+.toast-card:focus-visible {
+  box-shadow: 0 0 0 1px var(--toast-border), 0 0 0 3px rgba(113, 113, 122, 0.35), var(--toast-shadow);
+}
+
+/* Invisible bridge across the gap so hover doesn't flicker between toasts */
+.toast-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--toast-gap) + 1px);
+}
+.toast-viewport[data-y='bottom'] .toast-card::after { bottom: 100%; }
+.toast-viewport[data-y='top']    .toast-card::after { top: 100%; }
+
+/* ── Collapsed stack (default) ── */
+.toast-card[data-mounted] {
+  --y: calc(var(--lift) * var(--index) * var(--toast-peek));
+  --s: calc(1 - var(--index) * 0.05);
+  opacity: 1;
+}
+
+.toast-viewport:not([data-expanded]) .toast-card:not([data-front]) {
+  height: var(--front-h);
+  overflow: hidden;
+}
+
+.toast-viewport:not([data-expanded]) .toast-card:not([data-front]) > * {
+  opacity: 0;
+}
+
+/* ── Expanded (hover / tap / expand: true) ── */
+.toast-viewport[data-expanded] .toast-card[data-mounted] {
+  --y: calc(var(--lift) * var(--offset));
+  --s: 1;
+}
+
+.toast-card[data-mounted]:not([data-visible]) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Swipe ── */
+.toast-card[data-swiping] {
+  opacity: calc(1 - var(--swipe-amount, 0) * 0.8);
+  transition:
+    opacity 0ms,
+    height var(--toast-duration) var(--toast-ease);
+  cursor: grabbing;
+}
+
+/* ── Exit (Vue TransitionGroup name="toast") ── */
+.toast-viewport .toast-card[data-mounted].toast-leave-active {
+  pointer-events: none;
+}
+.toast-viewport .toast-card[data-mounted].toast-leave-to {
+  opacity: 0;
+}
+.toast-viewport .toast-card[data-mounted][data-front].toast-leave-to:not([data-swiped]) {
+  --y: calc(var(--lift) * -100%);
+}
+.toast-viewport .toast-card[data-mounted]:not([data-front]).toast-leave-to {
+  --s: calc(1 - var(--index) * 0.05 - 0.05);
 }
 
 /* ============================================
-   Icons — 16×16 minimalist
+   Content
    ============================================ */
-.toast-icon {
+.toast-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  transition: opacity var(--toast-duration) var(--toast-ease);
+}
+
+.toast-icon,
+.toast-spinner {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
@@ -89,156 +222,164 @@
 .toast-icon--error       { color: var(--toast-c-error); }
 .toast-icon--warning     { color: var(--toast-c-warning); }
 .toast-icon--info        { color: var(--toast-c-info); }
-.toast-icon--destructive { color: var(--toast-c-destructive); }
 .toast-icon--offline     { color: var(--toast-c-offline); }
 .toast-icon--update      { color: var(--toast-c-update); }
-.toast-icon--neutral     { color: var(--toast-c-neutral); }
+.toast-viewport[data-rich] .toast-icon { color: currentColor; }
 
-/* ============================================
-   Spinner
-   ============================================ */
+/* Icons pop in when a toast changes state (loading → success) */
+.toast-icon {
+  animation: toast-icon-in 300ms var(--toast-ease);
+}
+
+@keyframes toast-icon-in {
+  from { opacity: 0; transform: scale(0.6); }
+}
+
 @keyframes toast-spin {
   to { transform: rotate(360deg); }
 }
 
 .toast-spinner {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
-  border: 1.5px solid #e4e4e7;
-  border-top-color: var(--toast-c-muted);
+  box-sizing: border-box;
+  border: 1.5px solid var(--toast-border);
+  border-top-color: var(--toast-text-muted);
   border-radius: 50%;
   animation: toast-spin 0.7s linear infinite;
 }
 
-/* ============================================
-   Body
-   ============================================ */
 .toast-body {
   flex: 1;
   min-width: 0;
 }
 
+/* ×N badge when identical toasts are grouped */
+.toast-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  vertical-align: 1px;
+  color: var(--toast-text-muted);
+  background: var(--toast-hover);
+  border-radius: 999px;
+  animation: toast-count-pop 300ms var(--toast-ease);
+}
+
+@keyframes toast-count-pop {
+  from { transform: scale(1.5); }
+}
+
 .toast-title {
+  margin: 0;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
-  color: var(--toast-text);
-  margin: 0;
   letter-spacing: -0.01em;
+  color: var(--toast-text);
+  overflow-wrap: anywhere;
 }
 
 .toast-description {
-  font-size: 12px;
-  font-weight: 400;
+  margin: 2px 0 0;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--toast-text-muted);
-  margin: 2px 0 0;
+  overflow-wrap: anywhere;
 }
 
 /* ============================================
-   Close Button — always subtly visible
+   Buttons
    ============================================ */
-.toast-close {
-  flex-shrink: 0;
+.toast-actions {
   display: flex;
+  flex-shrink: 0;
+  align-self: center;
+  gap: 6px;
+}
+
+.toast-action-btn {
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--toast-bg);
+  background: var(--toast-text);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.toast-action-btn:hover { opacity: 0.88; }
+
+.toast-action-btn--cancel {
+  color: var(--toast-text);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--toast-border);
+}
+
+.toast-action-btn--cancel:hover {
+  opacity: 1;
+  background: var(--toast-hover);
+}
+
+.toast-close {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 20px;
   height: 20px;
-  margin: -2px -2px 0 0;
+  margin: -1px -4px 0 0;
   padding: 0;
-  border: none;
-  border-radius: 5px;
+  color: var(--toast-text-muted);
   background: transparent;
-  color: #a1a1aa;
-  cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
-}
-
-.toast-card:hover .toast-close {
-  opacity: 1;
-}
-
-.toast-close:hover {
-  background: #f4f4f5;
-  color: var(--toast-text);
-}
-
-.toast-close svg {
-  width: 11px;
-  height: 11px;
-}
-
-/* ============================================
-   Action Button
-   ============================================ */
-.toast-action-btn {
-  flex-shrink: 0;
-  align-self: center;
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  font-family: inherit;
-  line-height: 1.4;
-  color: var(--toast-text);
-  background: transparent;
-  border: 0.5px solid var(--toast-border);
+  border: 0;
   border-radius: 5px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth);
+  opacity: 0.5;
+  transition: opacity 150ms ease, background 150ms ease;
 }
 
-.toast-action-btn:hover {
-  background: #f4f4f5;
-  border-color: #d4d4d8;
-}
+.toast-card:hover .toast-close,
+.toast-close:focus-visible { opacity: 1; }
+.toast-close:hover { background: var(--toast-hover); color: var(--toast-text); }
+.toast-close svg { width: 11px; height: 11px; }
 
 /* ============================================
-   Progress Bar Track & Fill
+   Progress / countdown
    ============================================ */
 .toast-progress-track {
   position: absolute;
-  bottom: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   height: 2px;
-  background: rgba(0, 0, 0, 0.04);
-  border-bottom-left-radius: var(--toast-radius);
-  border-bottom-right-radius: var(--toast-radius);
   overflow: hidden;
-}
-
-[data-theme='dark'] .toast-progress-track {
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0 0 var(--toast-radius) var(--toast-radius);
+  background: var(--toast-border);
 }
 
 .toast-progress-fill {
   height: 100%;
   background: var(--toast-text-muted);
-  border-radius: 999px;
-  width: 100%;
   transform-origin: left;
+  transition: transform 200ms linear;
 }
 
 .toast-card--success .toast-progress-fill     { background: var(--toast-c-success); }
 .toast-card--error .toast-progress-fill       { background: var(--toast-c-error); }
 .toast-card--warning .toast-progress-fill     { background: var(--toast-c-warning); }
 .toast-card--info .toast-progress-fill        { background: var(--toast-c-info); }
-.toast-card--destructive .toast-progress-fill { background: var(--toast-c-destructive); }
 .toast-card--update .toast-progress-fill      { background: var(--toast-c-update); }
-.toast-card--neutral .toast-progress-fill     { background: var(--toast-c-neutral); }
 
 @keyframes toast-countdown {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }
 
 .toast-progress-fill--countdown {
@@ -247,91 +388,36 @@
   animation-fill-mode: forwards;
 }
 
-/* ============================================================
-   TransitionGroup Animations — shadcn-sonner style
-   Silky spring curve, subtle scale + translate, zero jitter
-   ============================================================ */
-
-/* Shared move (sibling reflow) */
-.toast-slide-down-move,
-.toast-slide-up-move {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+/* ============================================
+   Mobile — full-width, safe-area aware, bigger tap targets
+   ============================================ */
+@media (max-width: 600px) {
+  .toast-viewport {
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+    transform: none;
+  }
+  .toast-viewport[data-y='top']    { top: max(16px, env(safe-area-inset-top)); }
+  .toast-viewport[data-y='bottom'] { bottom: max(16px, env(safe-area-inset-bottom)); }
 }
 
-/* ── TOP (top-right, top-left, top-center) ── */
-.toast-slide-down-enter-active {
-  transition:
-    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.toast-slide-down-leave-active {
-  transition:
-    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  position: absolute;
-  pointer-events: none;
-  width: var(--toast-width);
-  max-width: calc(100vw - 32px);
-}
-.toast-slide-down-enter-from {
-  opacity: 0;
-  transform: translateY(-16px) scale(0.96);
-}
-.toast-slide-down-enter-to {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.toast-slide-down-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.toast-slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-12px) scale(0.96);
-}
-
-/* ── BOTTOM (bottom-right, bottom-left, bottom-center) ── */
-.toast-slide-up-enter-active {
-  transition:
-    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.toast-slide-up-leave-active {
-  transition:
-    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  position: absolute;
-  pointer-events: none;
-  width: var(--toast-width);
-  max-width: calc(100vw - 32px);
-}
-.toast-slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(16px) scale(0.96);
-}
-.toast-slide-up-enter-to {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.toast-slide-up-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.toast-slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(12px) scale(0.96);
+@media (hover: none) {
+  .toast-close { opacity: 1; width: 28px; height: 28px; margin: -5px -8px -5px 0; }
+  .toast-action-btn { padding: 6px 12px; }
 }
 
 /* ============================================
-   Reduced motion
+   Reduced motion — fade only
    ============================================ */
-@media (prefers-reduced-motion) {
-  .toast-card,
-  .toast-slide-down-enter-active,  .toast-slide-down-leave-active,
-  .toast-slide-up-enter-active,    .toast-slide-up-leave-active,
-  .toast-slide-down-move,  .toast-slide-up-move,
+@media (prefers-reduced-motion: reduce) {
+  .toast-card {
+    transition: opacity 200ms ease, height 0ms;
+  }
+  .toast-icon,
+  .toast-count,
   .toast-progress-fill--countdown {
-    transition: none !important;
-    animation: none !important;
+    animation: none;
   }
 }

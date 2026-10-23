@@ -1,4 +1,4 @@
-import type { Component, VNode } from 'vue'
+import type { Component, MaybeRefOrGetter, VNode } from 'vue'
 
 export type ToastComponent = Component | VNode | (() => VNode | string)
 
@@ -9,10 +9,8 @@ export type ToastVariant =
   | 'warning'
   | 'info'
   | 'loading'
-  | 'destructive'
   | 'offline'
   | 'update'
-  | 'neutral'
 
 export type ToastPosition =
   | 'top-right'
@@ -27,41 +25,80 @@ export interface ToastAction {
   onClick: () => void
 }
 
+export type ToastTheme = 'light' | 'dark' | 'system'
+
 export interface ToastConfig {
   max?: number
   duration?: number
   position?: ToastPosition
+  /** Toasts visible in the collapsed stack (default 3). */
+  visibleToasts?: number
+  /** Always show the stack expanded instead of collapsed (default false). */
+  expand?: boolean
+  /** Tinted backgrounds for status variants (default false). */
+  richColors?: boolean
+  theme?: ToastTheme
+  /** Merge identical toasts into one with a ×N badge (default true). */
+  group?: boolean
 }
 
 export interface Toast {
   id: string
-  title?: string
-  description?: string
+  cancel?: ToastAction
+  title?: MaybeRefOrGetter<string | undefined>
+  description?: MaybeRefOrGetter<string | undefined>
   variant: ToastVariant
   position: ToastPosition
   duration: number
   dismissible: boolean
   action?: ToastAction
-  progress?: number
+  progress?: MaybeRefOrGetter<number | undefined>
   showProgress?: boolean
   component?: ToastComponent
   onDismiss?: () => void
-  onUndo?: () => void | Promise<void>
+  /** Times an identical toast was fired while this one was visible */
+  count?: number
 }
 
 export interface ToastOptions {
-  title?: string
-  description?: string
+  /** Reusing an existing id updates that toast instead of stacking a duplicate. */
+  id?: string
+  title?: MaybeRefOrGetter<string | undefined>
+  cancel?: ToastAction
+  description?: MaybeRefOrGetter<string | undefined>
   variant?: ToastVariant
   position?: ToastPosition
   duration?: number
   dismissible?: boolean
   action?: ToastAction
-  progress?: number
+  progress?: MaybeRefOrGetter<number | undefined>
   showProgress?: boolean
   component?: ToastComponent
   onDismiss?: () => void
-  onUndo?: () => void | Promise<void>
+}
+
+export interface ConfirmToastOptions {
+  title?: string
+  description?: string
+  position?: ToastPosition
+  variant?: ToastVariant
+  confirmLabel?: string
+  cancelLabel?: string
+  /** Resolves to false after this many ms (default: waits forever). */
+  duration?: number
+}
+
+type ToastInput<A> = ToastOptions | string | ((arg: A) => ToastOptions | string)
+
+export interface RetryToastOptions<T> {
+  loading: ToastOptions | string
+  success: ToastInput<T>
+  /** Defaults to the thrown error's message */
+  error?: ToastInput<unknown>
+  retryLabel?: string
+  /** Retries offered before giving up (default: unlimited) */
+  maxRetries?: number
+  position?: ToastPosition
 }
 
 export interface ToastPromiseOptions<T> {

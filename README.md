@@ -54,7 +54,14 @@ app.use(CreateFeatherToast)
 app.mount('#app')
 ```
 
-The plugin automatically mounts `<ToastContainer />` and injects the `toast` instance via `provide/inject`.
+The plugin automatically mounts `<ToastContainer />`, injects its stylesheet, and provides the `toast` instance via `provide/inject`. No CSS import needed.
+
+Need to load the CSS yourself (strict CSP, SSR critical CSS)? Turn injection off and import the file:
+
+```ts
+import 'feather-toast-vue/style.css'
+app.use(CreateFeatherToast, { injectStyles: false })
+```
 
 ---
 
@@ -109,8 +116,9 @@ toast.error('Request failed.')
 toast.warning('Storage running low.')
 toast.info('Version 2.4 available.')
 toast.loading('Uploading files...')
-toast.destructive('3 records deleted permanently.')
-toast.neutral('Session token refreshed.')
+
+// Pass anything thrown straight in  the message is extracted
+try { await save() } catch (err) { toast.error(err) }
 
 // Full options object
 toast.success({
@@ -129,10 +137,8 @@ toast.success({
 | `warning`     | 5 000 ms    | Yes         | Caution / low-priority issue       |
 | `info`        | 5 000 ms    | Yes         | Informational message              |
 | `loading`     | Persistent  | No          | Spinner; use with `toast.promise`  |
-| `destructive` | 5 000 ms    | Yes         | High-severity irreversible action  |
 | `offline`     | Persistent  | No          | Network connectivity lost          |
 | `update`      | 8 000 ms    | Yes         | App or version update available    |
-| `neutral`     | 3 000 ms    | Yes         | Passive ambient notification       |
 
 ---
 
@@ -173,11 +179,122 @@ toast.config({
   max: 3,                    // Max visible toasts per position (0 = unlimited)
   duration: 4000,            // Default auto-dismiss timeout in milliseconds
   position: 'bottom-right',  // Default spawn position
+  visibleToasts: 3,          // Toasts shown in the collapsed stack
+  expand: false,             // true = always expanded instead of the Sonner-style stack
+  richColors: false,         // Tinted backgrounds for success/error/warning/info/update
+  theme: 'light',            // 'light' | 'dark' | 'system'
 })
 
 const config = toast.getConfig()
 // => { max: 3, duration: 4000, position: 'bottom-right' }
 ```
+
+---
+
+## Stacking & Gestures
+
+Toasts stack like shadcn/Sonner: newer toasts sit in front and older ones peek out behind.
+
+- **Desktop:** hover the stack to expand it. All timers pause while it is expanded.
+- **Touch:** tap the stack to expand it, and tap outside to collapse it.
+- **Swipe** left or right to dismiss. A quick flick also works.
+- Timers also pause while the browser tab is hidden.
+- All motion is `transform`/`opacity` only, and `prefers-reduced-motion` falls back to a plain fade.
+
+### Deduplicate with `id`
+
+Passing an `id` that is already on screen updates that toast in place instead of stacking a duplicate:
+
+```ts
+toast.success({ id: 'autosave', title: 'Draft saved' })
+```
+
+---
+
+## Reactive toasts
+
+`title`, `description` and `progress` accept a `ref`, a `computed` or a getter. The toast updates when the value changes, with no update calls needed:
+
+```ts
+const pct = ref(0)
+toast.loading({
+  title: computed(() => `Uploading& ${pct.value}%`),
+  progress: pct,
+})
+```
+
+---
+
+## toast.flash
+
+Works like `toast()`, but survives a full page load. If the page reloads or navigates away while the toast is visible, it shows again on the next page. Use it after login redirects, OAuth round-trips and classic form posts. On SPA navigation it just stays on screen.
+
+```ts
+toast.flash.success('Signed in')   // also .error / .warning / .info, or toast.flash({ ... })
+window.location.href = '/dashboard'
+```
+
+Only the title, description, variant, position and duration are carried over (as plain JSON in `sessionStorage`). Buttons and custom components are not.
+
+---
+
+## Testing
+
+The store can be read without rendering anything, so tests don't need a DOM or `<ToastContainer />`. The helpers work with Vitest, Jest or any runner that catches thrown errors.
+
+```ts
+import { expectToast, expectNoToasts, getToasts, clickToastAction, resetToasts } from 'feather-toast-vue'
+
+beforeEach(() => resetToasts())          // toasts, config and pending flashes
+
+it('confirms before deleting', async () => {
+  const done = store.deleteFiles()       // calls toast.confirm(...)
+  await clickToastAction({ title: /Delete/ })          // or (matcher, 'cancel')
+  await done
+  expectToast({ variant: 'success', title: 'Files deleted' })
+})
+```
+
+A failing `expectToast` lists every active toast, so you can see what showed up instead. `getToasts()` returns plain snapshots (refs resolved) that are safe for `toEqual`.
+
+---
+
+## Duplicate grouping
+
+Firing the same plain toast (same variant, title, description and position) while it's still visible doesn't stack a copy. The visible toast gets a **×N** badge and its timer restarts. That keeps error storms and repeated clicks readable. Turn it off with `toast.config({ group: false })`.
+
+---
+
+## toast.retry
+
+Runs an async task behind a loading toast. If it throws, the toast becomes an error with a **Retry** button that re-runs the task in the same toast. The returned promise resolves with the task's result, or rejects when the user dismisses the error or `maxRetries` runs out.
+
+```ts
+const users = await toast.retry(() => api.get('/users'), {
+  loading: 'Loading users...',
+  success: (res) => `Loaded ${res.data.length} users`,
+  // error: (err) => ({ title: 'Could not load users', description: String(err) }),  // default: the error's message
+  maxRetries: 3,
+})
+```
+
+---
+
+## toast.confirm
+
+Inline confirmation that resolves to `true` or `false`. Cancel, close, swipe and timeout all resolve `false`.
+
+```ts
+const ok = await toast.confirm('Delete 3 files?', {
+  description: 'This cannot be undone.',
+  confirmLabel: 'Delete',   // default "Confirm"
+  cancelLabel: 'Keep',      // default "Cancel"
+  duration: 10000,          // optional auto-cancel, shows a countdown bar
+})
+if (ok) await deleteFiles()
+```
+
+Any toast can also take a secondary `cancel: { label, onClick }` button next to `action`.
 
 ---
 

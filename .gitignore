@@ -24,6 +24,9 @@ coverage
 *.sln
 *.sw?
 
+# Graphify
+graphify-out/
+
 *.tsbuildinfo
 
 .eslintcache
