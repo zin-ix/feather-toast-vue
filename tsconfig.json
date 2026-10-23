@@ -5,7 +5,10 @@
       "path": "./tsconfig.node.json"
     },
     {
-      "path": "./tsconfig.app.json"
+      "path": "./packages/toast/tsconfig.json"
+    },
+    {
+      "path": "./playground/tsconfig.json"
     }
   ]
 }

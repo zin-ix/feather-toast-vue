@@ -7,15 +7,14 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/feather-toast-vue/',
-  build: {
-    outDir: 'dist-demo',
-  },
   plugins: [
     vue(),
     vueDevTools(),
   ],
   resolve: {
     alias: {
+      // Point at package sources so the demo hot-reloads without a library build
+      '@feather-vue/toast': fileURLToPath(new URL('../packages/toast/src/index.ts', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },

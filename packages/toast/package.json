@@ -1,0 +1,56 @@
+{
+  "name": "@feather-vue/toast",
+  "version": "3.0.0",
+  "description": "A lightweight, customizable toast notification plugin for Vue 3",
+  "homepage": "https://zin-ix.github.io/feather-toast-vue/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zin-ix/feather-toast-vue.git",
+    "directory": "packages/toast"
+  },
+  "bugs": {
+    "url": "https://github.com/zin-ix/feather-toast-vue/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "toast",
+    "notification",
+    "toast-notification",
+    "vue-plugin",
+    "vite",
+    "typescript",
+    "feather-vue"
+  ],
+  "license": "MIT",
+  "author": "zin",
+  "type": "module",
+  "main": "./dist/feather-toast.umd.cjs",
+  "module": "./dist/feather-toast.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/feather-toast.es.js",
+      "require": "./dist/feather-toast.umd.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./style.css": "./dist/feather-toast-vue.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run type-check && vite build",
+    "type-check": "vue-tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}
