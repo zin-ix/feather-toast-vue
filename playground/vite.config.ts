@@ -14,7 +14,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Point at package sources so the demo hot-reloads without a library build
-      '@feather-vue/toast': fileURLToPath(new URL('../packages/toast/src/index.ts', import.meta.url)),
+      'feather-toast-vue': fileURLToPath(new URL('../packages/toast/src/index.ts', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },

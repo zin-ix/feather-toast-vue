@@ -6,7 +6,7 @@ Lightweight, zero-dependency Vue 3 components. Install only what you use.
 
 | Package | Description |
 |---|---|
-| [`@feather-vue/toast`](./packages/toast) | Accessible toast notifications with spring animations, promise support and swipe-to-dismiss |
+| [`feather-toast-vue`](./packages/toast) | Accessible toast notifications with spring animations, promise support and swipe-to-dismiss |
 
 ## Development
 

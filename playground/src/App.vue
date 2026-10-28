@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, inject, h } from 'vue'
-import { useFeatherToast } from '@feather-vue/toast'
-import type { ToastPosition } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
+import type { ToastPosition } from 'feather-toast-vue'
 
 type FeatherToastApi = ReturnType<typeof useFeatherToast>
 
@@ -28,7 +28,7 @@ watch(isDark, (dark) => {
 // ── Install copy ────────────────────────────────────
 const installCopied = ref(false)
 function copyInstall() {
-  navigator.clipboard.writeText('npm install @feather-vue/toast')
+  navigator.clipboard.writeText('npm install feather-toast-vue')
   installCopied.value = true
   setTimeout(() => { installCopied.value = false }, 2000)
 }
@@ -126,7 +126,7 @@ toast.promise(savePromise, {
   }),
 })`
 
-const SNIPPET_CONFIG = `import { useFeatherToast } from '@feather-vue/toast'
+const SNIPPET_CONFIG = `import { useFeatherToast } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -142,21 +142,21 @@ const current = toast.getConfig()`
 
 const SNIPPET_SETUP_VUE3 = `import { createApp } from 'vue'
 import App from './App.vue'
-import { CreateFeatherToast } from '@feather-vue/toast'
+import { CreateFeatherToast } from 'feather-toast-vue'
 
 const app = createApp(App)
 app.use(CreateFeatherToast)
 app.mount('#app')`
 
 const SNIPPET_SETUP_NUXT = `import { defineNuxtPlugin } from '#app'
-import { CreateFeatherToast } from '@feather-vue/toast'
+import { CreateFeatherToast } from 'feather-toast-vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(CreateFeatherToast)
 })`
 
 const SNIPPET_QUICKSTART = `<script setup lang="ts">
-import { useFeatherToast } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -173,8 +173,8 @@ function onSave() {
 <\/script>`
 
 const SNIPPET_NETWORK = `import { onMounted, onUnmounted } from 'vue'
-import { useFeatherToast } from '@feather-vue/toast'
-import type { NetworkToastController } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
+import type { NetworkToastController } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -653,7 +653,7 @@ function fireNetwork() {
               <line x1="17.5" y1="15" x2="9" y2="15"/>
             </svg>
           </span>
-          <span class="topnav__name">@feather-vue/toast</span>
+          <span class="topnav__name">feather-toast-vue</span>
           <span class="topnav__ver">v2.1.0</span>
         </div>
 
@@ -741,11 +741,11 @@ function fireNetwork() {
             <span class="section__num">01</span>
             <h2 class="section__title">Installation & Setup</h2>
           </div>
-          <p class="section__desc">Install @feather-vue/toast using your preferred package manager:</p>
+          <p class="section__desc">Install feather-toast-vue using your preferred package manager:</p>
 
           <div class="code-block">
             <span class="code-block__prompt">$</span>
-            <code class="code-block__text">npm install @feather-vue/toast</code>
+            <code class="code-block__text">npm install feather-toast-vue</code>
             <button
               class="code-block__copy"
               :class="{ 'code-block__copy--done': installCopied }"
@@ -762,8 +762,8 @@ function fireNetwork() {
             </button>
           </div>
           <div class="alt-installs">
-            <span class="alt-install">yarn add @feather-vue/toast</span>
-            <span class="alt-install">pnpm add @feather-vue/toast</span>
+            <span class="alt-install">yarn add feather-toast-vue</span>
+            <span class="alt-install">pnpm add feather-toast-vue</span>
           </div>
 
           <!-- Framework Setup Guides -->
@@ -779,7 +779,7 @@ function fireNetwork() {
               <div class="doc-card__code">
                 <pre class="pre"><code><span class="t-kw">import</span> <span class="t-w">{ createApp }</span> <span class="t-kw">from</span> <span class="t-str">'vue'</span>
 <span class="t-kw">import</span> <span class="t-w">App</span> <span class="t-kw">from</span> <span class="t-str">'./App.vue'</span>
-<span class="t-kw">import</span> <span class="t-w">{ CreateFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+<span class="t-kw">import</span> <span class="t-w">{ CreateFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">const</span> <span class="t-w">app</span> <span class="t-op">=</span> <span class="t-fn">createApp</span><span class="t-w">(App)</span>
 <span class="t-w">app</span><span class="t-op">.</span><span class="t-fn">use</span><span class="t-w">(CreateFeatherToast)</span>
@@ -803,7 +803,7 @@ function fireNetwork() {
               </div>
               <div class="doc-card__code">
                 <pre class="pre"><code><span class="t-kw">import</span> <span class="t-w">{ defineNuxtPlugin }</span> <span class="t-kw">from</span> <span class="t-str">'#app'</span>
-<span class="t-kw">import</span> <span class="t-w">{ CreateFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+<span class="t-kw">import</span> <span class="t-w">{ CreateFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">export default</span> <span class="t-fn">defineNuxtPlugin</span><span class="t-w">((nuxtApp) => {</span>
   <span class="t-w">nuxtApp.vueApp</span><span class="t-op">.</span><span class="t-fn">use</span><span class="t-w">(CreateFeatherToast)</span>
@@ -837,7 +837,7 @@ function fireNetwork() {
             </div>
             <div class="doc-card__code">
               <pre class="pre"><code><span class="t-kw">&lt;script setup lang="ts"&gt;</span>
-<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">const</span> <span class="t-w">{ toast }</span> <span class="t-op">=</span> <span class="t-fn">useFeatherToast</span><span class="t-w">()</span>
 
@@ -1197,7 +1197,7 @@ function fireNetwork() {
                 <span class="doc-badge">Global</span>
               </div>
               <div class="doc-card__code">
-                <pre class="pre"><code><span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+                <pre class="pre"><code><span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">const</span> <span class="t-w">{ toast }</span> <span class="t-op">=</span> <span class="t-fn">useFeatherToast</span><span class="t-w">()</span>
 
@@ -1251,8 +1251,8 @@ function fireNetwork() {
               </div>
               <div class="doc-card__code">
                 <pre class="pre"><code><span class="t-kw">import</span> <span class="t-w">{ onMounted, onUnmounted }</span> <span class="t-kw">from</span> <span class="t-str">'vue'</span>
-<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
-<span class="t-kw">import type</span> <span class="t-w">{ NetworkToastController }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
+<span class="t-kw">import type</span> <span class="t-w">{ NetworkToastController }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">const</span> <span class="t-w">{ toast }</span> <span class="t-op">=</span> <span class="t-fn">useFeatherToast</span><span class="t-w">()</span>
 
@@ -1296,7 +1296,7 @@ function fireNetwork() {
                 <pre class="pre"><code><span class="t-comment">// App.vue — register network monitor once for the whole app</span>
 <span class="t-kw">&lt;script setup lang="ts"&gt;</span>
 <span class="t-kw">import</span> <span class="t-w">{ onMounted, onUnmounted }</span> <span class="t-kw">from</span> <span class="t-str">'vue'</span>
-<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'@feather-vue/toast'</span>
+<span class="t-kw">import</span> <span class="t-w">{ useFeatherToast }</span> <span class="t-kw">from</span> <span class="t-str">'feather-toast-vue'</span>
 
 <span class="t-kw">const</span> <span class="t-w">{ toast }</span> <span class="t-op">=</span> <span class="t-fn">useFeatherToast</span><span class="t-w">()</span>
 <span class="t-kw">let</span> <span class="t-w">monitor</span> <span class="t-op">=</span> <span class="t-w">null</span>
@@ -1306,7 +1306,7 @@ function fireNetwork() {
 <span class="t-kw">&lt;/script&gt;</span></code></pre>
                 <button
                   class="code-copy-btn"
-                  @click="copySnippet(`// App.vue\nimport { onMounted, onUnmounted } from 'vue'\nimport { useFeatherToast } from '@feather-vue/toast'\n\nconst { toast } = useFeatherToast()\nlet monitor = null\n\nonMounted(() => { monitor = toast.network() })\nonUnmounted(() => { monitor?.stop() })`, 'feat-net-app')"
+                  @click="copySnippet(`// App.vue\nimport { onMounted, onUnmounted } from 'vue'\nimport { useFeatherToast } from 'feather-toast-vue'\n\nconst { toast } = useFeatherToast()\nlet monitor = null\n\nonMounted(() => { monitor = toast.network() })\nonUnmounted(() => { monitor?.stop() })`, 'feat-net-app')"
                 >
                   {{ copiedSnippetId === 'feat-net-app' ? 'Copied!' : 'Copy Code' }}
                 </button>

@@ -6,8 +6,6 @@ import type { Toast as ToastItem, ToastPosition } from '../types/toast'
 
 const { toasts, config, dismiss } = useToast()
 
-const GAP = 14
-
 const isMounted = ref(false)
 const docHidden = ref(false)
 
@@ -44,10 +42,11 @@ function isExpanded(position: ToastPosition) {
   return !!(config.value.expand || hovered[position] || touchOpen[position])
 }
 
+/** Summed height of the toasts in front; CSS adds the --toast-gap spacing. */
 function offsetOf(list: ToastItem[], index: number) {
   let sum = 0
   for (let i = 0; i < index; i++) sum += heights[list[i]!.id] ?? 0
-  return sum + index * GAP
+  return sum
 }
 
 function onHeight(id: string, h: number) {

@@ -4,7 +4,7 @@
    variables, so it stays on the compositor (60fps on
    mobile). Inline vars set by Toast.vue:
      --index    0 = front of the stack
-     --offset   px distance from the edge when expanded
+     --offset   summed px height of the toasts in front (gap added in CSS)
      --h        measured height of this toast
      --front-h  measured height of the front toast
      --swipe-x  live swipe offset
@@ -167,7 +167,7 @@
 
 /* ── Expanded (hover / tap / expand: true) ── */
 .toast-viewport[data-expanded] .toast-card[data-mounted] {
-  --y: calc(var(--lift) * var(--offset));
+  --y: calc(var(--lift) * (var(--offset) + var(--index) * var(--toast-gap)));
   --s: 1;
 }
 
@@ -388,24 +388,50 @@
   animation-fill-mode: forwards;
 }
 
+@media (hover: none) {
+  .toast-close { opacity: 1; width: 28px; height: 28px; margin: -5px -8px -5px 0; }
+  .toast-action-btn { padding: 6px 12px; }
+}
+
 /* ============================================
-   Mobile — full-width, safe-area aware, bigger tap targets
+   Mobile — compact, full-width, safe-area aware;
+   actions drop to their own row so text keeps its width
    ============================================ */
 @media (max-width: 600px) {
   .toast-viewport {
-    left: 16px;
-    right: 16px;
+    --toast-edge: 12px;
+    --toast-radius: 8px;
+    --toast-gap: 8px;
+    --toast-peek: 8px;
+    left: max(var(--toast-edge), env(safe-area-inset-left));
+    right: max(var(--toast-edge), env(safe-area-inset-right));
     width: auto;
     max-width: none;
     transform: none;
   }
-  .toast-viewport[data-y='top']    { top: max(16px, env(safe-area-inset-top)); }
-  .toast-viewport[data-y='bottom'] { bottom: max(16px, env(safe-area-inset-bottom)); }
-}
+  .toast-viewport[data-y='top']    { top: max(var(--toast-edge), env(safe-area-inset-top)); }
+  .toast-viewport[data-y='bottom'] { bottom: max(var(--toast-edge), env(safe-area-inset-bottom)); }
 
-@media (hover: none) {
-  .toast-close { opacity: 1; width: 28px; height: 28px; margin: -5px -8px -5px 0; }
-  .toast-action-btn { padding: 6px 12px; }
+  .toast-content {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .toast-icon,
+  .toast-spinner { width: 14px; height: 14px; margin-top: 1.5px; }
+
+  .toast-title       { font-size: 12.5px; line-height: 1.4; }
+  .toast-description { margin-top: 1px; font-size: 12px; line-height: 1.4; }
+
+  .toast-actions {
+    order: 1;
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+  .toast-action-btn { padding: 4px 10px; font-size: 12px; }
+
+  .toast-close { width: 24px; height: 24px; margin: -4px -6px -4px 0; }
+  .toast-close svg { width: 10px; height: 10px; }
 }
 
 /* ============================================

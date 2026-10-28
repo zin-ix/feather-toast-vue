@@ -1,4 +1,4 @@
-# @feather-vue/toast
+# feather-toast-vue
 
 Lightweight, accessible toast notifications for Vue 3 with spring-based animations, promise support, swipe-to-dismiss, and a minimal footprint.
 
@@ -28,11 +28,11 @@ Lightweight, accessible toast notifications for Vue 3 with spring-based animatio
 ## Installation
 
 ```bash
-npm install @feather-vue/toast
+npm install feather-toast-vue
 # or
-yarn add @feather-vue/toast
+yarn add feather-toast-vue
 # or
-pnpm add @feather-vue/toast
+pnpm add feather-toast-vue
 ```
 
 ---
@@ -47,7 +47,7 @@ Register the plugin once in your application entry file.
 ```ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import { CreateFeatherToast } from '@feather-vue/toast'
+import { CreateFeatherToast } from 'feather-toast-vue'
 
 const app = createApp(App)
 app.use(CreateFeatherToast)
@@ -59,7 +59,7 @@ The plugin automatically mounts `<ToastContainer />`, injects its stylesheet, an
 Need to load the CSS yourself (strict CSP, SSR critical CSS)? Turn injection off and import the file:
 
 ```ts
-import '@feather-vue/toast/style.css'
+import 'feather-toast-vue/style.css'
 app.use(CreateFeatherToast, { injectStyles: false })
 ```
 
@@ -72,7 +72,7 @@ Create a client-only plugin file. Toast relies on browser APIs and must run excl
 **`plugins/toast.client.ts`**
 ```ts
 import { defineNuxtPlugin } from '#app'
-import { CreateFeatherToast } from '@feather-vue/toast'
+import { CreateFeatherToast } from 'feather-toast-vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(CreateFeatherToast)
@@ -89,7 +89,7 @@ Call `useFeatherToast()` inside any Vue component's `<script setup>` to access t
 
 ```vue
 <script setup lang="ts">
-import { useFeatherToast } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -171,7 +171,7 @@ toast.config({ max: 0 })   // Unlimited
 Configure defaults once — typically in your root component.
 
 ```ts
-import { useFeatherToast } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -243,7 +243,7 @@ Only the title, description, variant, position and duration are carried over (as
 The store can be read without rendering anything, so tests don't need a DOM or `<ToastContainer />`. The helpers work with Vitest, Jest or any runner that catches thrown errors.
 
 ```ts
-import { expectToast, expectNoToasts, getToasts, clickToastAction, resetToasts } from '@feather-vue/toast'
+import { expectToast, expectNoToasts, getToasts, clickToastAction, resetToasts } from 'feather-toast-vue'
 
 beforeEach(() => resetToasts())          // toasts, config and pending flashes
 
@@ -485,7 +485,7 @@ Render any Vue component, render function, or `h()` VNode directly inside a toas
 
 ```ts
 import { h } from 'vue'
-import { useFeatherToast } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 
@@ -537,8 +537,8 @@ Register once in your root `App.vue` to monitor connectivity for the entire appl
 <!-- App.vue -->
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import { useFeatherToast } from '@feather-vue/toast'
-import type { NetworkToastController } from '@feather-vue/toast'
+import { useFeatherToast } from 'feather-toast-vue'
+import type { NetworkToastController } from 'feather-toast-vue'
 
 const { toast } = useFeatherToast()
 let networkMonitor: NetworkToastController | null = null
@@ -607,7 +607,7 @@ import type {
   NetworkToastOptions,
   NetworkToastController,
   ToastComponent,
-} from '@feather-vue/toast'
+} from 'feather-toast-vue'
 ```
 
 ### ToastOptions
